@@ -17,5 +17,5 @@ script.pyの内容を登録してください。
 | | |
 | - | - |
 | Add Button | 選択中のノードに強制クックのボタンを追加します。<br><img src="image/usage001.jpg" width="200"> |
-| Force Cook Display Node | 表示フラグがONになっているノードより上流の全ノードをクックします。<br>以下の例では、null1より上流の全pythonノードとsubnetノードの中身をクックします。<br><img src="image/usage002.jpg" width="200"> |
+| Force Cook Display Node | 表示フラグがONになっているノードより上流の全ノードをクックします。<br>以下の例では、null1より上流のpythonノードとsubnetノードの中身を全てクックします。<br><img src="image/usage002.jpg" width="200"> |
 
