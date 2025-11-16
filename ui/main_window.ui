@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>150</height>
+    <height>200</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,9 +23,16 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="button_force_cook_displayed_node">
+     <widget class="QPushButton" name="button_force_cook_display_node">
       <property name="text">
-       <string>Force Cook Displayed Node</string>
+       <string>Force Cook Display Node</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="check_box_save_cache_files">
+      <property name="text">
+       <string>Save Cache Files</string>
       </property>
      </widget>
     </item>

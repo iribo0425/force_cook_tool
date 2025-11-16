@@ -8,9 +8,69 @@ def run(ui_file_path: str, py_file_path: str) -> None:
 
     with open(temp_file_path, "r", encoding="utf-8") as temp_file,\
         open(py_file_path, "w", encoding="utf-8") as py_file:
-        py_file.write("from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale, QMetaObject, QObject, QPoint, QRect, QSize, QTime, QUrl, Qt)\n")
-        py_file.write("from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont, QFontDatabase, QGradient, QIcon, QImage, QKeySequence, QLinearGradient, QPainter, QPalette, QPixmap, QRadialGradient, QTransform)\n")
-        py_file.write("from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QHBoxLayout, QLabel, QLineEdit, QMainWindow, QMenuBar, QPushButton, QSizePolicy, QSlider, QStatusBar, QVBoxLayout, QWidget)\n")
+
+        import_statement0 = ""
+
+        while True:
+            line: str = temp_file.readline()
+
+            if "from PySide6.QtCore" in line:
+                while True:
+                    import_statement0 += line.lstrip().replace("\n", "")
+
+                    line: str = temp_file.readline()
+
+                    if ")" in line:
+                        import_statement0 += line.lstrip()
+
+                        break
+            
+            if import_statement0:
+                break
+
+        py_file.write(import_statement0)
+
+        import_statement1 = ""
+
+        while True:
+            line: str = temp_file.readline()
+
+            if "from PySide6.QtGui" in line:
+                while True:
+                    import_statement1 += line.lstrip().replace("\n", "")
+
+                    line: str = temp_file.readline()
+
+                    if ")" in line:
+                        import_statement1 += line.lstrip()
+
+                        break
+            
+            if import_statement1:
+                break
+
+        py_file.write(import_statement1)
+
+        import_statement2 = ""
+
+        while True:
+            line: str = temp_file.readline()
+
+            if "from PySide6.QtWidgets" in line:
+                while True:
+                    import_statement2 += line.lstrip().replace("\n", "")
+
+                    line: str = temp_file.readline()
+
+                    if ")" in line:
+                        import_statement2 += line.lstrip()
+
+                        break
+            
+            if import_statement2:
+                break
+
+        py_file.write(import_statement2)
         py_file.write("\n")
 
         while True:
