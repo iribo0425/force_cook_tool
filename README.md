@@ -16,8 +16,8 @@ script.pyの内容を登録してください。
 
 | | |
 | - | - |
-| Add Button | 選択中のノードに強制クックのボタンを追加します。<br><img src="image/usage001.jpg" width="200"> |
-| Force Cook Display Node && Upstream Nodes | 表示フラグがONのノードと、そのノードより上流のノードを全て強制クックします。<br>以下の例では、null1ノードと、null1ノードより上流のpythonノードとsubnetノードの中身を全て強制クックします。<br><img src="image/usage002.jpg" width="200"> |
+| Force Cook Selected Nodes && Upstream Nodes | 選択中のノードと、そのノードより上流のノードを全て強制クックします。<br>以下の例では、null1ノードと、null1ノードより上流のpythonノードとsubnetノードの中身を全て強制クックします。<br><img src="image/usage002.jpg" width="200"> |
 | Save Cache Files | 強制クックの際に、File CacheノードのSave to Diskを実行するかを設定します。 |
 | Force Cook Nodes Referenced By Object Merge | 強制クックの際に、Object Mergeノードの参照先も強制クックするかを設定します。 |
 | Log Messages | デバッグ用。強制クックの際に、ログをコンソールに出力するかを設定します。 |
+| Add Button | 選択中のノードに強制クックのボタンを追加します。<br><img src="image/usage001.jpg" width="200"> |
