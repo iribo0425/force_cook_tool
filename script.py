@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,QMetaObject, QObject, QPoint, QRect,QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,QFont, QFontDatabase, QGradient, QIcon,QImage, QKeySequence, QLinearGradient, QPainter,QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QLabel, QMainWindow,QMenuBar, QPushButton, QSizePolicy, QStatusBar,QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QLabel,QMainWindow, QMenuBar, QPushButton, QSizePolicy,QStatusBar, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -15,6 +15,18 @@ class Ui_MainWindow(object):
         self.button_add_params = QPushButton(self.centralwidget)
         self.button_add_params.setObjectName(u"button_add_params")
         self.verticalLayout.addWidget(self.button_add_params)
+        self.frame = QFrame(self.centralwidget)
+        self.frame.setObjectName(u"frame")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
+        self.frame.setSizePolicy(sizePolicy)
+        self.frame.setMinimumSize(QSize(0, 2))
+        self.frame.setMaximumSize(QSize(16777215, 2))
+        self.frame.setFrameShape(QFrame.Shape.HLine)
+        self.frame.setFrameShadow(QFrame.Shadow.Sunken)
+        self.verticalLayout.addWidget(self.frame)
         self.button_force_cook_nodes = QPushButton(self.centralwidget)
         self.button_force_cook_nodes.setObjectName(u"button_force_cook_nodes")
         self.verticalLayout.addWidget(self.button_force_cook_nodes)

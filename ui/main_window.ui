@@ -23,6 +23,34 @@
      </widget>
     </item>
     <item>
+     <widget class="QFrame" name="frame">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>2</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>2</height>
+       </size>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Shape::HLine</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Shadow::Sunken</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QPushButton" name="button_force_cook_nodes">
       <property name="text">
        <string>Force Cook Display Node &amp;&amp; Upstream Nodes</string>
