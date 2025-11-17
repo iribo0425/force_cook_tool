@@ -90,15 +90,15 @@ def b_is_file_cache(node: hou.Node) -> bool:
     return node.type().name() == "filecache::2.0"
 
 def get_display_node(network: hou.Node) -> hou.Node:
-    display_node: hou.Node = None
+    node_display: hou.Node = None
 
     for child in network.children():
         if hasattr(child, "isDisplayFlagSet")\
             and child.isDisplayFlagSet():
-            display_node = child
+            node_display = child
             break
 
-    return display_node
+    return node_display
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
@@ -112,8 +112,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.__ui.button_force_cook_nodes.clicked.connect(self.__button_force_cook_nodes_clicked)
 
     def __button_add_params_clicked(self) -> None:
-        for node_selected in hou.selectedNodes():
-            ptg: hou.ParmTemplateGroup = node_selected.parmTemplateGroup()
+        for selected_node in hou.selectedNodes():
+            ptg: hou.ParmTemplateGroup = selected_node.parmTemplateGroup()
 
             for param_name in PARAM_NAMES:
                 param_template: hou.ParmTemplate = ptg.find(param_name)
@@ -121,127 +121,123 @@ class MainWindow(QtWidgets.QMainWindow):
                 if param_template:
                     ptg.remove(param_template)
 
-            param_template_button = hou.ButtonParmTemplate(
+            button_param_template = hou.ButtonParmTemplate(
                 PARAM_NAME_BUTTON,
                 "Force Cook",
                 script_callback="kwargs[\"node\"].cook(force=True)",
                 script_callback_language=hou.scriptLanguage.Python)
 
-            param_template_folder = hou.FolderParmTemplate(
+            folder_param_template = hou.FolderParmTemplate(
                 PARAM_NAME_FOLDER,
                 "Force Cook",
                 folder_type=hou.folderType.Collapsible)
-            param_template_folder.addParmTemplate(param_template_button)
-            ptg.append(param_template_folder)
+            folder_param_template.addParmTemplate(button_param_template)
+            ptg.append(folder_param_template)
 
-            node_selected.setParmTemplateGroup(ptg)
+            selected_node.setParmTemplateGroup(ptg)
 
     def __button_force_cook_nodes_clicked(self) -> None:
-        network_editor: hou.NetworkEditor = hou.ui.paneTabOfType(hou.paneTabType.NetworkEditor)
+        for selected_node in hou.selectedNodes():
+            self.__log_message(f"Selected Node: {selected_node.path()}")
 
-        if not network_editor:
-            return
+            start_node: hou.Node = None
 
-        start_node: hou.Node = None
-        network: hou.Node = network_editor.pwd()
-        display_node: hou.Node = get_display_node(network)
+            if b_is_file_cache(selected_node):
+                start_node = selected_node
+            elif selected_node.isNetwork():
+                start_node = get_display_node(selected_node)
 
-        if b_is_file_cache(display_node):
-            start_node = display_node
-        elif display_node.isNetwork():
-            start_node = get_display_node(display_node)
+                if not start_node:
+                    start_node = selected_node
+            else:
+                start_node = selected_node
+
+            self.__log_message(f"Start Node: {start_node.path()}")
 
             if not start_node:
-                start_node = display_node
-        else:
-            start_node = display_node
+                return
 
-        self.__log_message(f"Start Node: {start_node.path()}")
+            self.__log_message("########## Get Children & Inputs ##########")
 
-        if not start_node:
-            return
+            b_save_cache_files: bool = self.__ui.check_box_save_cache_files.isChecked()
+            b_force_cook_referenced_nodes: bool = self.__ui.check_box_force_cook_referenced_nodes.isChecked()
 
-        self.__log_message("########## Get Children & Inputs ##########")
+            discovered_nodes: list[hou.Node] = []
+            stack: list[hou.Node] = []
+            stack.append(start_node)
 
-        b_save_cache_files: bool = self.__ui.check_box_save_cache_files.isChecked()
-        b_force_cook_referenced_nodes: bool = self.__ui.check_box_force_cook_referenced_nodes.isChecked()
+            while stack:
+                current_node: hou.Node = stack.pop()
+                self.__log_message(f"Current Node: {current_node.path()}")
 
-        discovered_nodes: list[hou.Node] = []
-        stack: list[hou.Node] = []
-        stack.append(start_node)
+                if current_node in discovered_nodes:
+                    continue
 
-        while stack:
-            current_node: hou.Node = stack.pop()
-            self.__log_message(f"Current Node: {current_node.path()}")
+                discovered_nodes.append(current_node)
+                self.__log_message(f"Appended {current_node.path()} to discovered nodes.")
 
-            if current_node in discovered_nodes:
-                continue
+                if b_is_file_cache(current_node)\
+                    and (not b_save_cache_files):
+                    continue
 
-            discovered_nodes.append(current_node)
-            self.__log_message(f"Appended {current_node.path()} to discovered nodes.")
+                if b_is_object_merge(current_node):
+                    if b_force_cook_referenced_nodes:
+                        object_count: int = current_node.parm("numobj").eval()
 
-            if b_is_file_cache(current_node)\
-                and (not b_save_cache_files):
-                continue
+                        for i in range(object_count):
+                            b_is_enabled: bool = current_node.parm(f"enable{i + 1}").eval() == 1
 
-            if b_is_object_merge(current_node):
-                if b_force_cook_referenced_nodes:
-                    object_count: int = current_node.parm("numobj").eval()
+                            if not b_is_enabled:
+                                continue
 
-                    for i in range(object_count):
-                        b_is_enabled: bool = current_node.parm(f"enable{i + 1}").eval() == 1
+                            object_path: str = current_node.parm(f"objpath{i + 1}").eval()
+                            input_node: hou.Node = hou.node(object_path)
 
-                        if not b_is_enabled:
-                            continue
+                            if b_is_file_cache(input_node):
+                                stack.append(input_node)
+                            elif input_node.isNetwork():
+                                display_node: hou.Node = get_display_node(input_node)
 
-                        object_path: str = current_node.parm(f"objpath{i + 1}").eval()
-                        input_node: hou.Node = hou.node(object_path)
-
-                        if b_is_file_cache(input_node):
-                            stack.append(input_node)
-                        elif input_node.isNetwork():
-                            display_node_: hou.Node = get_display_node(input_node)
-
-                            if display_node_:
-                                stack.append(display_node_)
+                                if display_node:
+                                    stack.append(display_node)
+                                else:
+                                    stack.append(input_node)
                             else:
                                 stack.append(input_node)
-                        else:
-                            stack.append(input_node)
-            else:
-                for input_connection in current_node.inputConnections():
-                    if b_is_file_cache(input_connection.inputNode()):
-                        stack.append(input_connection.inputNode())
-                    elif input_connection.inputNode().isNetwork():
-                        if b_is_valid_index(input_connection.inputNode().subnetOutputs(), input_connection.outputIndex()):
-                            input_node: hou.Node = input_connection.inputNode().subnetOutputs()[input_connection.outputIndex()]
-                            stack.append(input_node)
+                else:
+                    for input_connection in current_node.inputConnections():
+                        if b_is_file_cache(input_connection.inputNode()):
+                            stack.append(input_connection.inputNode())
+                        elif input_connection.inputNode().isNetwork():
+                            if b_is_valid_index(input_connection.inputNode().subnetOutputs(), input_connection.outputIndex()):
+                                input_node: hou.Node = input_connection.inputNode().subnetOutputs()[input_connection.outputIndex()]
+                                stack.append(input_node)
+                            else:
+                                stack.append(input_connection.inputNode())
                         else:
                             stack.append(input_connection.inputNode())
+
+            self.__log_message("##############################")
+            self.__log_message("########## Force Cook & Save ##########")
+
+            for discovered_node in reversed(discovered_nodes):
+                if b_is_object_merge(discovered_node):
+                    if not b_force_cook_referenced_nodes:
+                        discovered_node.cook(force=True)
+                        self.__log_message(f"Force cooked {discovered_node.path()}.")
+                elif b_is_file_cache(discovered_node):
+                    if b_save_cache_files:
+                        discovered_node.parm("execute").pressButton()
+                        self.__log_message(f"Saveed cache files at {discovered_node.path()}.")
                     else:
-                        stack.append(input_connection.inputNode())
-
-        self.__log_message("##############################")
-        self.__log_message("########## Force Cook & Save ##########")
-
-        for discovered_node in reversed(discovered_nodes):
-            if b_is_object_merge(discovered_node):
-                if not b_force_cook_referenced_nodes:
-                    discovered_node.cook(force=True)
-                    self.__log_message(f"Force cooked {discovered_node.path()}.")
-            elif b_is_file_cache(discovered_node):
-                if b_save_cache_files:
-                    discovered_node.parm("execute").pressButton()
-                    self.__log_message(f"Saveed cache files at {discovered_node.path()}.")
+                        discovered_node.cook(force=True)
+                        self.__log_message(f"Force cooked {discovered_node.path()}.")
                 else:
-                    discovered_node.cook(force=True)
-                    self.__log_message(f"Force cooked {discovered_node.path()}.")
-            else:
-                if not discovered_node.inputConnections():
-                    discovered_node.cook(force=True)
-                    self.__log_message(f"Force cooked {discovered_node.path()}.")
+                    if not discovered_node.inputConnections():
+                        discovered_node.cook(force=True)
+                        self.__log_message(f"Force cooked {discovered_node.path()}.")
 
-        self.__log_message("##############################")
+            self.__log_message("##############################")
 
     def __log_message(self, *args, **kwargs) -> None:
         if self.__ui.check_box_log_messages.isChecked():
