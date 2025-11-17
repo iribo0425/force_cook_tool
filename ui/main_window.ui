@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>200</height>
+    <height>226</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,9 +23,9 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="button_force_cook_display_node">
+     <widget class="QPushButton" name="button_force_cook_nodes">
       <property name="text">
-       <string>Force Cook Display Node</string>
+       <string>Force Cook Display Node &amp;&amp; Upstream Nodes</string>
       </property>
      </widget>
     </item>
@@ -33,6 +33,20 @@
      <widget class="QCheckBox" name="check_box_save_cache_files">
       <property name="text">
        <string>Save Cache Files</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="check_box_force_cook_referenced_nodes">
+      <property name="text">
+       <string>Force Cook Nodes Referenced By Object Merge</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="check_box_log_messages">
+      <property name="text">
+       <string>Log Messages</string>
       </property>
      </widget>
     </item>
