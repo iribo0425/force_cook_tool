@@ -1,5 +1,5 @@
 # [Houdini] Force Cook Tool
-ノードを強制的に再クックするためのツールです。Pythonノードなど、下流ノードの表示フラグの切り替えだけでは再クックされないノードに対して有効です。
+ノードを強制的に再クックするためのツールです。
 
 ## 動作確認環境
 Houdini Indie Limited-Commercial 21.0.440
